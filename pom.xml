@@ -14,6 +14,13 @@
     </modules>
     <packaging>pom</packaging>
 
+    <distributionManagement>
+        <repository>
+            <id>efekosdev</id>
+            <url>file://C:\EfekosDev\Maven</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -57,6 +64,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.1</version>
+                <configuration>
+                    <outputDirectory>C:\Java\ManagedMenus\build</outputDirectory>
+                </configuration>
             </plugin>
         </plugins>
     </build>
