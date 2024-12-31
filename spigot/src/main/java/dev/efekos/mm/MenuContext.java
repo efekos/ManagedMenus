@@ -22,6 +22,7 @@
 
 package dev.efekos.mm;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -29,19 +30,19 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
 
-public class MenuData {
-    private static final Map<UUID, MenuData> instances = new HashMap<>();
+public class MenuContext {
+    private static final Map<UUID, MenuContext> instances = new HashMap<>();
     private final Player owner;
     private final Stack<Menu> menuHistory = new Stack<>();
     private final Map<String, Object> data = new HashMap<>();
 
-    private MenuData(Player owner) {
+    private MenuContext(Player owner) {
         this.owner = owner;
     }
 
-    public static MenuData of(Player owner) {
+    public static MenuContext of(Player owner) {
         if (instances.containsKey(owner.getUniqueId())) return instances.get(owner.getUniqueId());
-        MenuData data = new MenuData(owner);
+        MenuContext data = new MenuContext(owner);
         instances.put(owner.getUniqueId(), data);
         return data;
     }
@@ -69,6 +70,30 @@ public class MenuData {
     public Menu lastMenu() {
         menuHistory.pop();
         return menuHistory.pop();
+    }
+
+    public void setString(String key,String value) {
+        set(key, value);
+    }
+
+    public String getString(String key) {
+        return String.valueOf(get(key));
+    }
+
+    public void setUniqueId(String key, UUID uuid) {
+        setString(key, uuid.toString());
+    }
+
+    public UUID getUniqueId(String key) {
+        return UUID.fromString(getString(key));
+    }
+
+    public Player getPlayer(String key){
+        return Bukkit.getPlayer(getUniqueId(key));
+    }
+
+    public void setPlayer(String key,Player player) {
+        setUniqueId(key, player.getUniqueId());
     }
 
 }

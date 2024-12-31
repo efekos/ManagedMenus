@@ -41,9 +41,9 @@ import java.util.stream.Collectors;
 public abstract class Menu implements InventoryHolder {
     protected Inventory inventory;
     protected Player owner;
-    protected MenuData data;
+    protected MenuContext data;
 
-    public Menu(MenuData data) {
+    public Menu(MenuContext data) {
         this.owner = data.getOwner();
         this.data = data;
     }

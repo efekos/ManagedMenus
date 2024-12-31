@@ -34,7 +34,7 @@ public abstract class PaginatedMenu extends Menu {
     private int page = 0;
     private List<ItemStack> items = new ArrayList<>();
 
-    public PaginatedMenu(MenuData data) {
+    public PaginatedMenu(MenuContext data) {
         super(data);
     }
 
