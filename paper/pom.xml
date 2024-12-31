@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>mm-paper</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <name>ManagedMenusPaper</name>
     <packaging>jar</packaging>
     <parent>
         <groupId>dev.efekos.mm</groupId>
         <artifactId>mm-root</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

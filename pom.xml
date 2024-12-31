@@ -6,7 +6,7 @@
 
     <groupId>dev.efekos.mm</groupId>
     <artifactId>mm-root</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <name>ManagedMenusRoot</name>
     <modules>
         <module>paper</module>
