@@ -25,6 +25,7 @@ package dev.efekos.mm;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -34,14 +35,23 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public abstract class Menu implements InventoryHolder {
     protected Inventory inventory;
     protected Player owner;
     protected MenuContext data;
+
+    public Menu(Player owner){
+        this(MenuContext.of(owner));
+    }
 
     public Menu(MenuContext data) {
         this.owner = data.getOwner();
@@ -63,6 +73,7 @@ public abstract class Menu implements InventoryHolder {
     public abstract void fill();
 
     @Override
+    @Nonnull
     public Inventory getInventory() {
         return inventory;
     }
@@ -87,6 +98,10 @@ public abstract class Menu implements InventoryHolder {
         return item;
     }
 
+    protected ItemStack createItem(Material material, String displayName, List<String> lore){
+        return createItem(material, displayName, lore.toArray(String[]::new));
+    }
+
     protected ItemStack createSkull(Player owner, String displayName, String... lore) {
         ItemStack item = createItem(Material.PLAYER_HEAD, displayName, lore);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
@@ -94,6 +109,33 @@ public abstract class Menu implements InventoryHolder {
         meta.setOwningPlayer(owner);
         item.setItemMeta(meta);
         return item;
+    }
+
+    protected ItemStack createSkull(Player owner, String displayName, List<String> lore){
+        return createSkull(owner, displayName, lore.toArray(String[]::new));
+    }
+
+    protected ItemStack createBlackStainedGlassPane(){
+        return createItem(Material.BLACK_STAINED_GLASS_PANE,"");
+    }
+
+    private static final NamespacedKey BUTTON_ID = new NamespacedKey("mm","button_id");
+
+    protected ItemStack createButton(String buttonId,Material material,String displayName,String... lore){
+        ItemStack stack = createItem(material, displayName, lore);
+        ItemMeta meta = stack.getItemMeta();
+        meta.getPersistentDataContainer().set(BUTTON_ID, PersistentDataType.STRING, buttonId);
+        stack.setItemMeta(meta);
+        return stack;
+    }
+
+    protected ItemStack createButton(String buttonId,Material material,String displayName,List<String> lore){
+        return createButton(buttonId, material, displayName, lore.toArray(String[]::new));
+    }
+
+    protected boolean isButton(ItemStack item,String buttonId){
+        PersistentDataContainer pdc = item.getItemMeta().getPersistentDataContainer();
+        return item.hasItemMeta() && pdc.has(BUTTON_ID, PersistentDataType.STRING) && Objects.equals(pdc.get(BUTTON_ID, PersistentDataType.STRING), buttonId);
     }
 
     protected void back() {
