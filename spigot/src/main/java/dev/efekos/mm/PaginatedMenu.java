@@ -31,6 +31,7 @@ import java.util.List;
 
 public abstract class PaginatedMenu extends Menu {
     protected static final int maxItemsPerPage = 28;
+    private static final Integer[] border = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 44, 45, 46, 47, 51, 52, 53};
     private int page = 0;
     private List<ItemStack> items = new ArrayList<>();
 
@@ -73,9 +74,7 @@ public abstract class PaginatedMenu extends Menu {
     @Override
     public void fill() {
         this.items = getItems();
-        for (Integer i : new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 44, 45, 46, 47, 51, 52, 53}) {
-            inventory.setItem(i, createItem(Material.BLACK_STAINED_GLASS_PANE, " "));
-        }
+        for (Integer i : border) inventory.setItem(i, createBlackStainedGlassPane());
 
         inventory.setItem(48, createItem(Material.PAPER, getPreviousPageText()));
         inventory.setItem(49, createItem(Material.BOOK, getCurrentPageText(page + 1, Math.round((float) items.size() / maxItemsPerPage) + 1)));
