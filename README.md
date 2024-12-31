@@ -1,11 +1,27 @@
 ![](./assets/ManagedMenus.png)
 # ManagedMenus
 
+![](https://badgen.net/github/license/efekos/ManagedMenus)
+![](https://badgen.net/github/stars/efekos/ManagedMenus)
+![](https://badgen.net/github/release/efekos/ManagedMenus)
+![](https://badgen.net/github/releases/efekos/ManagedMenus)
+![](https://badgen.net/github/merged-prs/efekos/ManagedMenus)
+![](https://badgen.net/github/issues/efekos/ManagedMenus)
+
+<!-- TOC -->
+* [ManagedMenus](#managedmenus)
+* [Installation](#installation)
+  * [Maven](#maven)
+  * [Gradle](#gradle)
+* [Usage](#usage)
+* [License](#license)
+<!-- TOC -->
+
 ManagedMenus is a lightweight library used to create and handle custom GUIs easily in Spigot and Paper plugins.
 
-## Installation
+# Installation
 
-### Maven
+## Maven
 
 1. Add this repository:
 
@@ -28,7 +44,7 @@ ManagedMenus is a lightweight library used to create and handle custom GUIs easi
 </dependency>
 ````
 
-### Gradle
+## Gradle
 
 1. Add this repository:
 
@@ -42,7 +58,7 @@ maven { url = 'https://efekos.dev/maven' }
 implementation 'dev.efekos.mm:mm-paper:1.0'
 ```
 
-## Usage
+# Usage
 
 First off, you need to register **MenuEvents** in your `onEnable` method. This event listener will listen to a few menu
 events.
