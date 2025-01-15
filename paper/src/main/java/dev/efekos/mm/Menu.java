@@ -24,6 +24,7 @@
 
 package dev.efekos.mm;
 
+import dev.efekos.mm.task.MenuTickTask;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -42,6 +43,7 @@ public class Menu implements InventoryHolder {
 
     private final Inventory inventory;
     private final JavaPlugin plugin;
+    private MenuTickTask tickTask;
     private MenuEventListener events;
     private Consumer<InventoryOpenEvent> onOpen;
     private Consumer<InventoryCloseEvent> onClose;
@@ -99,6 +101,8 @@ public class Menu implements InventoryHolder {
     }
 
     public void onOpen(InventoryOpenEvent event) {
+        tickTask = new MenuTickTask(this,(Player) event.getPlayer());
+        tickTask.runTaskTimer(plugin,1,1);
         for (MenuItem item : items) if(item.listensTo(event))item.on(event);
         onOpen.accept(event);
     }
@@ -106,6 +110,8 @@ public class Menu implements InventoryHolder {
     public void onClose(InventoryCloseEvent event) {
         for (MenuItem item : items) if(item.listensTo(event))item.on(event);
         onClose.accept(event);
+        tickTask.cancel();
+        tickTask=null;
     }
 
     public void onDrag(InventoryDragEvent event) {

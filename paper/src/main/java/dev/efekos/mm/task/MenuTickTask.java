@@ -22,21 +22,26 @@
  * SOFTWARE.
  */
 
-package dev.efekos.mm;
+package dev.efekos.mm.task;
 
+import dev.efekos.mm.Menu;
+import dev.efekos.mm.MenuItem;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryEvent;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.scheduler.BukkitRunnable;
 
-public interface MenuItem {
+public class MenuTickTask extends BukkitRunnable {
 
-    boolean listensTo(InventoryEvent e);
-    void on(InventoryEvent e);
-    boolean placesItem();
-    void placeItems(Inventory inventory);
-    default boolean isTicked(){
-        return false;
-    };
-    default void tick(Inventory inventory, Player owner){};
+    private final Menu menu;
+    private final Player opener;
+
+    public MenuTickTask(Menu menu, Player opener) {
+        this.menu = menu;
+        this.opener = opener;
+    }
+
+    @Override
+    public void run() {
+        for (MenuItem item:menu.getItems()) if(item.isTicked()) item.tick(menu.getInventory(),opener);
+    }
 
 }
