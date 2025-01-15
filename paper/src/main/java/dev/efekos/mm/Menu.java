@@ -26,138 +26,125 @@ package dev.efekos.mm;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 
-public abstract class Menu implements InventoryHolder {
-    protected Inventory inventory;
-    protected Player owner;
-    protected MenuContext data;
+public class Menu implements InventoryHolder {
 
-    public Menu(Player owner){
-        this(MenuContext.of(owner));
+    private final Inventory inventory;
+    private final JavaPlugin plugin;
+    private MenuEventListener events;
+    private Consumer<InventoryOpenEvent> onOpen;
+    private Consumer<InventoryCloseEvent> onClose;
+    private Consumer<InventoryDragEvent> onDrag;
+    private Consumer<InventoryMoveItemEvent> onMove;
+    private final List<MenuItem> items = new ArrayList<>();
+
+    private void setupEvents(){
+        if(events!=null)return;
+        events = new MenuEventListener(this);
+        plugin.getServer().getPluginManager().registerEvents(events, plugin);
     }
 
-    public Menu(MenuContext data) {
-        this.owner = data.getOwner();
-        this.data = data;
+    public void open(Player player){
+        setupEvents();
+        inventory.clear();
+        for (MenuItem item : items)
+            if (item.placesItem())
+                item.placeItems(inventory);
+        player.openInventory(inventory);
     }
-
-    public abstract boolean cancelAllClicks();
-
-    public abstract int getRows();
-
-    public abstract Component getTitle();
-
-    public abstract void onClick(InventoryClickEvent event);
-
-    public abstract void onClose(InventoryCloseEvent event);
-
-    public abstract void onOpen(InventoryOpenEvent event);
-
-    public abstract void fill();
 
     @Override
-    @Nonnull
-    public Inventory getInventory() {
+    public @NotNull Inventory getInventory() {
         return inventory;
     }
 
-    public void open() {
-        this.inventory = Bukkit.createInventory(this, getSlots(), getTitle());
-        fill();
-
-        data.addMenu(this);
-        owner.openInventory(this.inventory);
+    public static Menu create(Component title,int rows,JavaPlugin owner){
+        return new Menu(title,owner,rows*9);
     }
 
-    protected ItemStack createItem(Material material, Component displayName, Component... lore) {
-        ItemStack item = new ItemStack(material, 1);
-        ItemMeta itemMeta = item.getItemMeta();
-
-        assert itemMeta != null;
-        itemMeta.displayName(displayName);
-        itemMeta.lore(Arrays.stream(lore).collect(Collectors.toList()));
-        item.setItemMeta(itemMeta);
-
-        return item;
+    Menu(Component title,JavaPlugin owner,int size) {
+        this.inventory = Bukkit.createInventory(this,size,title);
+        this.plugin = owner;
     }
 
-    protected ItemStack createItem(Material material, Component displayName, List<Component> lore){
-        return createItem(material, displayName, lore.toArray(Component[]::new));
+    public Menu onOpen(Consumer<InventoryOpenEvent> onOpen) {
+        this.onOpen = onOpen;
+        return this;
     }
 
-    protected ItemStack createSkull(Player owner, Component displayName, Component... lore) {
-        ItemStack item = createItem(Material.PLAYER_HEAD, displayName, lore);
-        SkullMeta meta = (SkullMeta) item.getItemMeta();
-        assert meta != null;
-        meta.setOwningPlayer(owner);
-        item.setItemMeta(meta);
-        return item;
+    public Menu onClose(Consumer<InventoryCloseEvent> onClose) {
+        this.onClose = onClose;
+        return this;
     }
 
-    protected ItemStack createSkull(Player owner, Component displayName, List<Component> lore){
-        return createSkull(owner, displayName, lore.toArray(Component[]::new));
+    public Menu onDrag(Consumer<InventoryDragEvent> onDrag) {
+        this.onDrag = onDrag;
+        return this;
     }
 
-    protected ItemStack createBlackStainedGlassPane(){
-        return createItem(Material.BLACK_STAINED_GLASS_PANE,Component.empty());
+    public Menu onMove(Consumer<InventoryMoveItemEvent> onMove) {
+        this.onMove = onMove;
+        return this;
     }
 
-    private static final NamespacedKey BUTTON_ID = new NamespacedKey("mm","button_id");
-
-    protected ItemStack createButton(String buttonId,Material material,Component displayName,Component... lore){
-        ItemStack stack = createItem(material, displayName, lore);
-        ItemMeta meta = stack.getItemMeta();
-        meta.getPersistentDataContainer().set(BUTTON_ID, PersistentDataType.STRING, buttonId);
-        stack.setItemMeta(meta);
-        return stack;
+    public void onOpen(InventoryOpenEvent event) {
+        for (MenuItem item : items) if(item.listensTo(event))item.on(event);
+        onOpen.accept(event);
     }
 
-    protected ItemStack createButton(String buttonId,Material material,Component displayName,List<Component> lore){
-        return createButton(buttonId, material, displayName, lore.toArray(Component[]::new));
+    public void onClose(InventoryCloseEvent event) {
+        for (MenuItem item : items) if(item.listensTo(event))item.on(event);
+        onClose.accept(event);
     }
 
-    protected boolean isButton(ItemStack item,String buttonId){
-        PersistentDataContainer pdc = item.getItemMeta().getPersistentDataContainer();
-        return item.hasItemMeta() && pdc.has(BUTTON_ID, PersistentDataType.STRING) && Objects.equals(pdc.get(BUTTON_ID, PersistentDataType.STRING), buttonId);
+    public void onDrag(InventoryDragEvent event) {
+        for (MenuItem item : items) if(item.listensTo(event))item.on(event);
+        onDrag.accept(event);
     }
 
-    protected void back() {
-        owner.closeInventory();
-        data.lastMenu().open();
+    public void onClick(InventoryClickEvent event){
+        for (MenuItem item : items) if(item.listensTo(event))item.on(event);
     }
 
-    protected void refresh() {
-        getInventory().clear();
-        fill();
+    public void onMove(InventoryMoveItemEvent event) {
+        onMove.accept(event);
     }
 
-    protected void fillEmptyWith(ItemStack tem) {
-        for (int i = 0; i < getSlots(); i++) {
-            if (getInventory().getItem(i) == null) getInventory().setItem(i, tem);
-        }
+    public Menu addItem(MenuItem item){
+        items.add(item);
+        return this;
     }
 
-    public int getSlots() {
-        return getRows() * 9;
+    public List<MenuItem> getItems() {
+        return new ArrayList<>(items);
+    }
+
+    public void clearItems(){
+        items.clear();
+    }
+
+    public void removeItem(int i){
+        if(i<0||i>=items.size()) return;
+        items.remove(i);
+    }
+
+    public void removeItem(MenuItem item){
+        items.remove(item);
+    }
+
+    public static void prevent(Cancellable cancellable){
+        cancellable.setCancelled(true);
     }
 
 }
