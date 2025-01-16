@@ -60,92 +60,40 @@ implementation 'dev.efekos.mm:mm-paper:1.0'
 
 # Usage
 
-First off, you need to register **MenuEvents** in your `onEnable` method. This event listener will listen to a few menu
-events.
+Here is a quick example to get started.
 
 ````java
-import dev.efekos.mm.MenuEvents;
-
-public void onEnable(){
-    getServer().getPluginManager().registerEvents(new MenuEvents(),this);
-}
+Player player;
+JavaPlugin instance; // Your plugin instance is required when creating a menu
+Advancement diamonds = Bukkit.getAdvancement(new NamespacedKey("minecraft","story/mine_diamond"));
+Advancement enchanter = Bukkit.getAdvancement(new NamespacedKey("minecraft","story/enchant_item"));
+Menu menu = new Menu(Component.text("Vault"), instance, 6 /*rows, so a large chest*/)
+        .addItem(MenuItem.background(BackgroundColor.BLACK))
+        .addItem(MenuItem.skull(0,player))
+        .addItem(MenuItem.button(new ItemStack(Material.IRON_AXE,1))
+                .slot(1) // you don't have to define slots like this every time. There are many other static methods in MenuItem.
+                .onClick((slot, clickedItem, clicker, inventory) -> clicker.damage(20))
+        )
+        .addItem(MenuItem.dynamicStack(new ItemStack(Material.IRON_PICKAXE,1)) // The difference between normal buttons/stacks and dynamic buttons/stacks
+                .slot(2)                                                       // is that dynamic stacks refresh their data in every tick
+                .dynamicMaterial((inventory, p) -> p.getAdvancementProgress(diamonds).isDone()?Material.DIAMOND_PICKAXE:Material.IRON_PICKAXE)
+                .dynamicGlint((inventory, p) -> p.getAdvancementProgress(enchanter).isDone()) // Uses mending to add glint and hides enchantments
+                .dynamicName((inventory, p) -> Component.text(p.getName()).append(Component.text("'s pickaxe")))
+                .refreshRate(2) // You can adjust the refresh rate if refreshing every tick is too much for the data used in the item
+        )
+        .addItem(MenuItem.square(BackgroundColor.BLUE.item())
+                .position(1,1)
+                .size(7,4)
+        )
+        .addItem(MenuItem.clickListener(9,10,11,12,13,14,15,16) // does not add any item, only to listen to clicks in specific slots.
+                .onClick((slot, clickedItem, clicker, inventory) -> clicker.sendMessage(Component.text("You clicked the second row!")))
+        )
+        .addItem(MenuItem.ticker((inventory, player1) -> System.out.println("debug log: "+player1.getName()+" : "+inventory.getSize()))) // just a ticker, useful for counters.
+        .onOpen(inventoryOpenEvent -> inventoryOpenEvent.getPlayer().sendMessage(Component.text("You opened the inventory!")))
+        .onClose(inventoryCloseEvent -> inventoryCloseEvent.getPlayer().sendMessage(Component.text("You closed the inventory!")))
+        ;
+        menu.open(player);
 ````
-
-Create an implementation of **Menu** or **PaginatedMenu** at anywhere you would like to. Here is a full example
-(using `mm-spigot`)
-
-````java
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.inventory.ItemStack;
-
-public class MyMenu extends Menu {
-
-    @Override
-    public boolean cancelAllClicks() {
-        return true;
-    }
-
-    @Override
-    public int getRows() {
-        return 6; // 6*9 = 54 slots
-    }
-
-    @Override
-    public String getTitle() {
-        return "My New Menu";
-    }
-
-    @Override
-    public void onClick(InventoryClickEvent e) {
-        owner.sendMessage("You clicked slot "+e.getSlot()+"!");
-        if(isButton(e.getCurrentItem(),"diamond_button")){
-            owner.getInventory().addItem(new ItemStack(Material.DIAMOND));
-            owner.sendMessage("Added a diamond to your inventory!");
-        }
-    }
-
-    @Override
-    public void onClose(InventoryCloseEvent e) {
-        owner.sendMessage("You closed the menu!");
-    }
-
-    @Override
-    public void onOpen(InventoryOpenEvent e) {
-        owner.sendMessage("You opened the menu!");
-    }
-
-    @Override
-    public void fill() {
-        inventory.setItem(0,createItem(Material.IRON_SWORD, ChatColor.RED+"Blood Sword",ChatColor.DARK_RED+"This sword is covered in blood."));
-        inventory.setItem(1,createSkull(this.owner,ChatColor.YELLOW+owner.getName(),ChatColor.GOLD+"This is you!"));
-        inventory.setItem(2,createButton("diamond_button",Material.DIAMOND,ChatColor.AQUA+"Diamond giver",
-                ChatColor.AQUA+"Click this button to",
-                ChatColor.AQUA+"get a diamond!"
-        ));
-
-        fillEmptyWith(createBlackStainedGlassPane());
-    }
-
-}
-````
-
-In anywhere of the code, construct your own menu and call `open()` to open the menu.
-
-```java
-import dev.efekos.mm.MenuContext;
-
-@EventHandler
-public void onJoin(PlayerJoinEvent e){
-    new MyMenu(MenuContext.of(e.getPlayer())).open();
-}
-
-```
-
-You can use **MenuContext** class to store global data across different GUIs.
 
 # License
 
