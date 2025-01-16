@@ -113,6 +113,18 @@ public interface MenuItem {
         return new DynamicButton();
     }
 
+    static DynamicItemStack dynamicStack(int slot,ItemStack stack){
+        return new DynamicItemStack(slot,stack);
+    }
+
+    static DynamicItemStack dynamicStack(ItemStack stack){
+        return new DynamicItemStack().firstStack(stack);
+    }
+
+    static DynamicItemStack dynamicStack(){
+        return new DynamicItemStack();
+    }
+
     static Square square(){
         return new Square();
     }
