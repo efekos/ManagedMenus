@@ -112,14 +112,4 @@ public class ClickListener implements ClickableMenuItem {
         return this;
     }
 
-    @Override
-    public boolean placesItem() {
-        return false;
-    }
-
-    @Override
-    public void placeItems(Inventory inventory) {
-
-    }
-
 }

@@ -36,16 +36,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 public record Skull(int slot,OfflinePlayer owner) implements MenuItem {
 
     @Override
-    public boolean listensTo(InventoryEvent e) {
-        return false;
-    }
-
-    @Override
-    public void on(InventoryEvent e) {
-
-    }
-
-    @Override
     public boolean placesItem() {
         return true;
     }

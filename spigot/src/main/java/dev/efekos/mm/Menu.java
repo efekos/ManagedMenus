@@ -69,7 +69,7 @@ public class Menu implements InventoryHolder {
         return inventory;
     }
 
-    public static Menu create(String title,int rows,JavaPlugin owner){
+    public static Menu create(String title, int rows, JavaPlugin owner){
         return new Menu(title,owner,rows*9);
     }
 

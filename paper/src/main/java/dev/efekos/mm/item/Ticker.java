@@ -26,32 +26,11 @@ package dev.efekos.mm.item;
 
 import dev.efekos.mm.MenuItem;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.util.function.BiConsumer;
 
 public record Ticker(BiConsumer<Inventory, Player> ticker) implements MenuItem {
-
-    @Override
-    public boolean listensTo(InventoryEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean placesItem() {
-        return false;
-    }
-
-    @Override
-    public void on(InventoryEvent e) {
-
-    }
-
-    @Override
-    public void placeItems(Inventory inventory) {
-
-    }
 
     @Override
     public boolean isTicked() {

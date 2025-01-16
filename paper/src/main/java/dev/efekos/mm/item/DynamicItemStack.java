@@ -60,16 +60,6 @@ public class DynamicItemStack implements MenuItem, DynamicProvider<DynamicItemSt
     }
 
     @Override
-    public boolean listensTo(InventoryEvent e) {
-        return false;
-    }
-
-    @Override
-    public void on(InventoryEvent e) {
-
-    }
-
-    @Override
     public boolean placesItem() {
         return true;
     }

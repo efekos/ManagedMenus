@@ -35,10 +35,10 @@ import java.util.function.BiConsumer;
 
 public interface MenuItem {
 
-    boolean listensTo(InventoryEvent e);
-    void on(InventoryEvent e);
-    boolean placesItem();
-    void placeItems(Inventory inventory);
+    default boolean listensTo(InventoryEvent e){return false;};
+    default void on(InventoryEvent e){};
+    default boolean placesItem(){return false;};
+    default void placeItems(Inventory inventory){};
     default boolean isTicked(){
         return false;
     };

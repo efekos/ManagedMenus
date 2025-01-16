@@ -25,21 +25,10 @@
 package dev.efekos.mm.item;
 
 import dev.efekos.mm.MenuItem;
-import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public record SingleItemStack(int slot,ItemStack stack) implements MenuItem {
-
-    @Override
-    public boolean listensTo(InventoryEvent e) {
-        return false;
-    }
-
-    @Override
-    public void on(InventoryEvent e) {
-
-    }
 
     @Override
     public boolean placesItem() {

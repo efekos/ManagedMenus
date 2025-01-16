@@ -171,6 +171,7 @@ public class DynamicButton implements ClickableMenuItem, DynamicProvider<Dynamic
         if(item==null||item.getType().isAir()) item = stack.clone();
         if(materialProvider!=null)item.setType(materialProvider.apply(inventory, owner));
         ItemMeta meta = item.getItemMeta();
+        assert meta != null;
         if(nameProvider!=null) meta.setDisplayName(nameProvider.apply(inventory, owner));
         if(loreProvider!=null) meta.setLore(loreProvider.apply(inventory,owner));
         if(glintProvider!=null) if(glintProvider.apply(inventory,owner)){

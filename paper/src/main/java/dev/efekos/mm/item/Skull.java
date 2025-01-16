@@ -29,22 +29,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 public record Skull(int slot,OfflinePlayer owner) implements MenuItem {
-
-    @Override
-    public boolean listensTo(InventoryEvent e) {
-        return false;
-    }
-
-    @Override
-    public void on(InventoryEvent e) {
-
-    }
 
     @Override
     public boolean placesItem() {

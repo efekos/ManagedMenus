@@ -34,26 +34,6 @@ import java.util.function.BiConsumer;
 public record Ticker(BiConsumer<Inventory, Player> ticker) implements MenuItem {
 
     @Override
-    public boolean listensTo(InventoryEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean placesItem() {
-        return false;
-    }
-
-    @Override
-    public void on(InventoryEvent e) {
-
-    }
-
-    @Override
-    public void placeItems(Inventory inventory) {
-
-    }
-
-    @Override
     public boolean isTicked() {
         return true;
     }
