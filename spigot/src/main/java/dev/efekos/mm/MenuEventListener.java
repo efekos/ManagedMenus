@@ -26,39 +26,39 @@ package dev.efekos.mm;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.event.inventory.*;
 
-public class MenuEvents implements Listener {
+public class MenuEventListener implements Listener {
 
-    public MenuEvents() {
+    private final Menu menu;
+
+    public MenuEventListener(Menu menu) {
+        this.menu = menu;
     }
 
     @EventHandler
-    public void onMenuClick(InventoryClickEvent e) {
-        InventoryHolder holder = e.getInventory().getHolder();
-        if (holder instanceof Menu menu) {
-            if (e.getCurrentItem() == null) {
-                e.setCancelled(menu.cancelAllClicks());
-                return;
-            }
-            menu.onClick(e);
-            if (!e.isCancelled() && menu.cancelAllClicks()) e.setCancelled(true);
-        }
+    public void onMenuOpen(InventoryOpenEvent e){
+        if (e.getInventory().getHolder()==menu) menu.onOpen(e);
     }
 
     @EventHandler
-    public void onMenuOpen(InventoryOpenEvent e) {
-        InventoryHolder holder = e.getInventory().getHolder();
-        if (holder instanceof Menu menu) menu.onOpen(e);
+    public void onMenuClose(InventoryCloseEvent e){
+        if (e.getInventory().getHolder()==menu) menu.onClose(e);
     }
 
     @EventHandler
-    public void onMenuClose(InventoryCloseEvent e) {
-        InventoryHolder holder = e.getInventory().getHolder();
-        if (holder instanceof Menu menu) menu.onClose(e);
+    public void onMenuDrag(InventoryDragEvent e){
+        if(e.getInventory().getHolder()==menu) menu.onDrag(e);
+    }
+
+    @EventHandler
+    public void onMenuMove(InventoryMoveItemEvent e){
+        if(e.getDestination().getHolder()==menu||e.getSource().getHolder()==menu) menu.onMove(e);
+    }
+
+    @EventHandler
+    public void onMenuClick(InventoryClickEvent e){
+        if(e.getInventory().getHolder()==menu) menu.onClick(e);
     }
 
 }
